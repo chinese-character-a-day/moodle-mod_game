@@ -8,6 +8,10 @@
  * @package game
  **/
 
-$module->version  = 2010090301;  // The current module version (Date: YYYYMMDDXX)
-$module->requires = 2010000000;  // Requires this Moodle version
-$module->cron     = 0;           // Period for cron to check this module (secs)
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version  = 2010090301;  // The current module version (Date: YYYYMMDDXX)
+$plugin->requires = 2010000000;  // Requires this Moodle version
+$plugin->cron     = 0;           // Period for cron to check this module (secs)
+$plugin->component = 'mod_game';
+$plugin->release = '1.0 (Build: 2010090301)';
