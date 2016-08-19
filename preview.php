@@ -22,7 +22,8 @@
 	//$_GET[ 'id'] = $update;
 	require_once( "header.php");
 
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	$context = context_module::instance($cm->id);
 
     if (!has_capability('mod/game:viewreports', $context)){
 		error( get_string( 'only_teachers', 'game'));
@@ -31,7 +32,8 @@
     $gamekind  = required_param('gamekind', PARAM_ALPHANUM);
     $update  = required_param('update', PARAM_INT);
 
-    $attemptid = required_param('attemptid',  0, PARAM_INT);
+    //$attemptid = required_param('attemptid',  0, PARAM_INT);
+    $attemptid = required_param('attemptid', PARAM_INT);
 	$attempt = $DB->get_record( 'game_attempts', array('id' => $attemptid));
 	$game = $DB->get_record( 'game', array( 'id' => $attempt->gameid));
 	$detail = $DB->get_record( 'game_'.$gamekind, array( 'id' => $attemptid));

@@ -13,6 +13,8 @@ function game_cryptex_continue( $id, $game, $attempt, $cryptexrec, $endofgame)
 {
     global $DB, $USER;
 
+	error_log('mod/game/cryptex/play.php : game_cryptex_continue');
+	
 	if( $endofgame){
 		game_updateattempts( $game, $attempt, -1, true);
 		$endofgame = false;
@@ -27,8 +29,6 @@ function game_cryptex_continue( $id, $game, $attempt, $cryptexrec, $endofgame)
 		$attempt = game_addattempt( $game);
 	}
 	
-	$textlib = textlib_get_instance();
-
 	$cryptex = new CryptexDB();
 
 	$questions = array();
@@ -44,7 +44,7 @@ function game_cryptex_continue( $id, $game, $attempt, $cryptexrec, $endofgame)
     $reps = array();
 	foreach( $recs as $rec){
 	    if( $game->param7 == false){	        
-    		if( $textlib->strpos( $rec->answertext, ' ')){
+    		if( core_text::strpos( $rec->answertext, ' ')){
 	    		continue;		//spaces not allowed
 	    	}
 	    }
@@ -87,6 +87,8 @@ function game_cryptex_continue( $id, $game, $attempt, $cryptexrec, $endofgame)
 
 function cryptex_showlegend( $legend, $title)
 {
+	error_log('mod/game/cryptex/play.php : cryptex_showlegend');
+	
   if( count( $legend) == 0)
     return;
     
@@ -101,6 +103,8 @@ function game_cryptex_check( $id, $game, $attempt, $cryptexrec, $q, $answer)
 {
     global $DB;
 
+	error_log('mod/game/cryptex/play.php : game_cryptex_check');
+	
 	if( $attempt === false){
 		game_cryptex_continue( $id, $game, $attempt, $cryptexrec, false);
 		return;
@@ -112,14 +116,13 @@ function game_cryptex_check( $id, $game, $attempt, $cryptexrec, $q, $answer)
 	$answer1 = trim( game_upper( $query->answertext));
 	$answer2 = trim( game_upper( $answer));
 
-	$textlib = textlib_get_instance();
-	$len1 = $textlib->strlen( $answer1);
-	$len2 = $textlib->strlen( $answer2);
+	$len1 = core_text::strlen( $answer1);
+	$len2 = core_text::strlen( $answer2);
 	$equal = ( $len1 == $len2);
 	if( $equal){
 		for( $i=0; $i < $len1; $i++)
 		{
-			if( $textlib->substr( $answer1, $i, 1) != $textlib->substr( $answer2, $i, 1))
+			if( core_text::substr( $answer1, $i, 1) != core_text::substr( $answer2, $i, 1))
 			{
 				$equal = true;
 				break;
@@ -142,7 +145,8 @@ function game_cryptex_play( $id, $game, $attempt, $cryptexrec, $crossm, $updatea
 {
     global $DB;
 
-	$textlib = textlib_get_instance();
+	error_log('mod/game/cryptex/play.php : game_cryptex_play');
+	
 	
 	global $CFG;
 
@@ -172,14 +176,14 @@ function game_cryptex_play( $id, $game, $attempt, $cryptexrec, $crossm, $updatea
     else
         $textdir = '';
 
-	$len = $textlib ->strlen( $mask);
+	$len = core_text::strlen( $mask);
 	
 	//count1 means there is a guested letter 
 	//count2 means there is a letter that not guessed
 	$count1 = $count2 = 0;
 	for($i=0; $i < $len; $i++)
 	{
-		$c = $textlib->substr( $mask, $i, 1);
+		$c = core_text::substr( $mask, $i, 1);
 		if( $c == '1'){
 			$count1++;
 		}else if( $c == '2')
@@ -323,6 +327,8 @@ function game_cryptex_onfinished( $id, $game, $attempt, $cryptexrec)
 {
 	global $CFG, $DB;
 
+	error_log('mod/game/cryptex/play.php : game_cryptex_onfinished');
+	
 	if (! $cm = $DB->get_record( 'course_modules', array( 'id' => $id))) {
 		print_error( "Course Module ID was incorrect id=$id");
 	}

@@ -27,7 +27,6 @@ class CryptexDB extends CrossDB
 
 	function computeletters( $crossm, $crossd)
 	{
-		$textlib = textlib_get_instance();
 		
 		$letters = '';
 		$cols = $crossm->cols + 1;
@@ -40,11 +39,11 @@ class CryptexDB extends CrossDB
 		{
 			$pos = $rec->col - 1 + ($rec->row-1) * $cols;
 			$s = $rec->answertext;
-			$len = $textlib->strlen( $s);
+			$len = core_text::strlen( $s);
 			
 			$a = array();
 			for( $i=0; $i < $len; $i++){
-				$a[] = $textlib->substr( $s, $i, 1);
+				$a[] = core_text::substr( $s, $i, 1);
 			}
 			
 			for( $i=0; $i < $len; $i++){
@@ -58,10 +57,10 @@ class CryptexDB extends CrossDB
 			}
 		}
 	
-		$len = $textlib->strlen( $letters);
+		$len = core_text::strlen( $letters);
 		$spaces = 0;
 		for( $i=0; $i < $len; $i++){
-			if( $textlib->substr( $letters, $i, 1) == '.'){
+			if( core_text::substr( $letters, $i, 1) == '.'){
 				$spaces++;
 			}
 		}	
@@ -83,7 +82,7 @@ class CryptexDB extends CrossDB
 
 		$ret_letters = "";
 		for( $row=0; $row < $crossm->rows; $row++){
-			$ret_letters .= $textlib->substr( $letters, $cols * $row, ($cols-1));
+			$ret_letters .= core_text::substr( $letters, $cols * $row, ($cols-1));
 		}
 
 
@@ -92,7 +91,6 @@ class CryptexDB extends CrossDB
 
     function display( $cols, $rows, $letters, $mask, $showsolution, $textdir)
     {
-		$textlib = textlib_get_instance();
 		
 		echo "<table border=1 $textdir>";
 		for( $row=0; $row < $rows; $row++)
@@ -100,8 +98,8 @@ class CryptexDB extends CrossDB
 			echo "<tr>";
 			for( $col=0; $col < $cols; $col++){
 				$pos = $cols * $row+$col;
-				$c = $textlib->substr( $letters, $pos, 1);
-				$m = $textlib->substr( $mask, $pos, 1);
+				$c = core_text::substr( $letters, $pos, 1);
+				$m = core_text::substr( $mask, $pos, 1);
 				
 				if( $showsolution and $m > '0'){
 					echo "<td align=center><b><FONT color=red>".$c."</font></td>";
@@ -119,11 +117,10 @@ class CryptexDB extends CrossDB
 	
 	function insertchar( &$letters, $cols, $rows, $char, &$spaces)
 	{
-		$textlib = textlib_get_instance();
 		
-		$len = $textlib->strlen( $letters);
+		$len = core_text::strlen( $letters);
 		for( $i=0; $i < $len; $i++){
-			if( $textlib->substr( $letters, $i, 1) == '.'){
+			if( core_text::substr( $letters, $i, 1) == '.'){
 				$this->setchar( $letters, $i, $char);
 				$spaces--;
 				return;
@@ -133,19 +130,18 @@ class CryptexDB extends CrossDB
 	
 	function insertchars( &$letters, $cols, $rows, $char, &$spaces)
 	{
-		$textlib = textlib_get_instance();
 		
-		$len = $textlib->strlen( $letters);
+		$len = core_text::strlen( $letters);
 		for( $i=0; $i < $len; $i++){
-			if( $textlib->substr( $letters, $i, 1) == '.'  and $textlib->substr( $letters, $i+1, 1) == '.' ){
-				$this->setchar( $letters, $i, $textlib->substr( $char, 0, 1));
-				$this->setchar( $letters, $i+1, $textlib->substr( $char, 1, 1));
+			if( core_text::substr( $letters, $i, 1) == '.'  and core_text::substr( $letters, $i+1, 1) == '.' ){
+				$this->setchar( $letters, $i, core_text::substr( $char, 0, 1));
+				$this->setchar( $letters, $i+1, core_text::substr( $char, 1, 1));
 				$spaces-=2;
 				return true;
 			}
-			if( $textlib->substr( $letters, $i, 1) == '.'  and $textlib->substr( $letters, $i+$cols+1, 1) == '.' ){
-				$this->setchar( $letters, $i, $textlib->substr( $char, 0, 1));
-				$this->setchar( $letters, $i + $cols+1, $textlib->substr( $char, 1, 1));
+			if( core_text::substr( $letters, $i, 1) == '.'  and core_text::substr( $letters, $i+$cols+1, 1) == '.' ){
+				$this->setchar( $letters, $i, core_text::substr( $char, 0, 1));
+				$this->setchar( $letters, $i + $cols+1, core_text::substr( $char, 1, 1));
 				$spaces-=2;
 				return true;
 			}
@@ -156,13 +152,12 @@ class CryptexDB extends CrossDB
 	
 	function gethash( $word)
 	{
-		$textlib = textlib_get_instance();
 		
 		$x = 37;
-		$len = count( $textlib->strlen( $word));
+		$len = count( core_text::strlen( $word));
 		
 		for($i=0; $i < $len; $i++){
-			$x = $x xor ord( $textlib->substr( $word, $i, 1));
+			$x = $x xor ord( core_text::substr( $word, $i, 1));
 		}
 		
 		return $x;
@@ -172,7 +167,6 @@ class CryptexDB extends CrossDB
 	{
         global $DB;
 
-		$textlib = textlib_get_instance();
 		
 		$questions = array();
 		$corrects = array();
@@ -191,14 +185,14 @@ class CryptexDB extends CrossDB
 				
 				$word = $rec->answertext;
 				$pos = $crossm->cols * ($rec->row-1)+($rec->col-1);
-				$len = $textlib->strlen( $word);
+				$len = core_text::strlen( $word);
 				$found = ($rec->answertext == $rec->studentanswer);
 
 				for( $i=0; $i < $len; $i++)
 				{
 					$c = ( $found ? '1' : '2');
 					
-					if( $textlib->substr( $mask, $pos,  1) != '1'){
+					if( core_text::substr( $mask, $pos,  1) != '1'){
 						game_setchar( $mask, $pos, $c);
 					}
 					

@@ -148,7 +148,7 @@ class Cross
   
 	function computenextcross( $N20, $t1, $ctries, $maxwords, &$nochange)
 	{
-		error_log('mod/game/cross/cross_class.php : computenextcross');
+		error_log('mod/game/cross/cross_class.php : computenextcross: ctries: '.$ctries);
 			
         $MAXW = $N20;
     
