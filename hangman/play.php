@@ -5,6 +5,8 @@
 function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $action)
 {
 	global $DB, $USER;
+	
+	error_log('mod/game/hangman/play.php : game_hangman_continue');
 
 	if( $attempt != false and $hangman != false){
 		if( ($action == 'nextword') and ($hangman->finishedword != 0)){
@@ -20,7 +22,6 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
 	
 	$updatehangman = (($attempt != false) and ($hangman != false));
 		
-	$textlib = textlib_get_instance();
 
 	//new game
     srand ((double)microtime()*1000003);
@@ -54,6 +55,8 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
 
         $allletters = game_getallletters( $answer2, $game->language);
 		
+		error_log('mod/game/hangman/play.php : game_hangman_continue: allletters: '.$allletters);
+			
         if( $allletters == ''){
             continue;
         }
@@ -152,10 +155,10 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
 		
 	$letters = '';
 	if( $game->param1){
-		$letters .= $textlib->substr( $min->answer, 0, 1);
+		$letters .= core_text::substr( $min->answer, 0, 1);
 	}
 	if( $game->param2){
-		$letters .= $textlib->substr( $min->answer, -1, 1);
+		$letters .= core_text::substr( $min->answer, -1, 1);
 	}
 	$newrec->letters = $letters;
 
@@ -180,6 +183,8 @@ function game_hangman_onfinishgame( $game, $attempt, $hangman)
 {
     global $DB;
 
+	error_log('mod/game/hangman/play.php : game_hangman_onfinishgame');
+	
 	$score = $hangman->corrects / $hangman->maxtries;
 
 	game_updateattempts( $game, $attempt, $score, true);
@@ -193,6 +198,8 @@ function game_hangman_play( $id, $game, $attempt, $hangman, $onlyshow=false, $sh
 {
 	global $CFG, $DB;
 	
+	error_log('mod/game/hangman/play.php : game_hangman_play');
+		
 	$query = $DB->get_record( 'game_queries', array( 'id' => $hangman->queryid));
 	
     if( $attempt->language != '')
@@ -268,11 +275,11 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
 {
 	global	$USER, $CFG, $DB;
 
+	error_log('mod/game/hangman/play.php : hangman_showpage');
+	
     $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or    
 	
 	$word = $query->answertext;
-	
-	$textlib = textlib_get_instance();
 	
     $newletter  = optional_param('newletter', "", PARAM_TEXT);
 	if( $newletter == '_'){
@@ -282,7 +289,7 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
     $letters = $hangman->letters;
     if( $newletter != NULL)
     {
-		if( $textlib->strpos( $letters,$newletter) === false){
+		if( core_text::strpos( $letters,$newletter) === false){
 			$letters .= $newletter;
 		}
     }
@@ -306,20 +313,20 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
 
     $word_line = $word_line2 = "";
 	
-	$len = $textlib->strlen( $word);
+	$len = core_text::strlen( $word);
 	
 	$done = 1;
 	$answer = '';
     for ($x=0; $x < $len; $x++)
     {
-		$char = $textlib->substr( $word, $x, 1);
+		$char = core_text::substr( $word, $x, 1);
 		
 		if( $showsolution){
 			$word_line2 .= ( $char == " " ? '&nbsp; ' : $char);
 			$done = 0;
 		}
 		
-		if ( $textlib->strpos($letters, $char)  === false){
+		if ( core_text::strpos($letters, $char)  === false){
 			$word_line.="_<font size=\"1\">&nbsp;</font>\r\n";
 			$done = 0;
 			$answer .= '_';
@@ -332,14 +339,14 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
 
     $correct = 0;
 
-    $len_alpha = $textlib->strlen($alpha);
+    $len_alpha = core_text::strlen($alpha);
 	$fontsize = 5;
 
     for ($c=0; $c < $len_alpha; $c++)
     {
-		$char = $textlib->substr( $alpha, $c, 1);
+		$char = core_text::substr( $alpha, $c, 1);
 		
-		if ( $textlib->strpos($letters, $char) === false)
+		if ( core_text::strpos($letters, $char) === false)
 		{
 			//User doesn't select this character
 			$params = 'id='.$id.'&amp;newletter='.urlencode( $char);
@@ -352,7 +359,7 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
 			continue;
 		}
 		
-		if ( $textlib->strpos($word, $char) === false)
+		if ( core_text::strpos($word, $char) === false)
 		{
 			$links .= "\r\n<font size=\"$fontsize\" color=\"red\">$char </font>";
 			$wrong++;
@@ -386,7 +393,7 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$word_line, &$word_
 		
 	}
 
-	$query->percent = ($correct -$wrong/6) /  $textlib->strlen( $word);
+	$query->percent = ($correct -$wrong/6) /  core_text::strlen( $word);
 	if( $query->percent < 0){
 		$query->percent = 0;
 	}
@@ -417,6 +424,8 @@ function hangman_oncorrect( $id, $word_line, $game, $attempt, $hangman, $query)
 {
     global $DB;
 
+	error_log('mod/game/hangman/play.php : hangman_oncorrect');
+	
 	echo "<BR/><BR/><font size=\"5\">\n$word_line</font>\r\n";
 	
 	echo '<p><BR/><font size="5" color="green">'.get_string( 'hangman_win', 'game').'</font><BR/><BR/></p>';
@@ -432,7 +441,8 @@ function hangman_oncorrect( $id, $word_line, $game, $attempt, $hangman, $query)
 
 function hangman_oninncorrect( $id, $word_line, $word, $game, $attempt, $hangman)
 {
-	$textlib = textlib_get_instance();
+
+	error_log('mod/game/hangman/play.php : hangman_oninncorrect');
 	
 	echo "\r\n<BR/><BR/><font size=\"5\">\n$word_line</font>\r\n";
 
@@ -440,7 +450,7 @@ function hangman_oninncorrect( $id, $word_line, $word, $game, $attempt, $hangman
 	
 	if( $game->param6){
 		//show the correct answer
-		$term=( $textlib->strpos($word, ' ') != false ? 'phrase' : 'word');
+		$term=( core_text::strpos($word, ' ') != false ? 'phrase' : 'word');
 		echo '<br/>'.get_string( 'hangman_correct_'.$term, 'game');
 		echo '<B>'.$word."</B><BR/><BR/>\r\n";
 	}
@@ -452,6 +462,8 @@ function game_hangman_show_nextword( $id, $game, $attempt, $hangman)
 {
 	global $CFG, $DB;
 	
+	error_log('mod/game/hangman/play.php : game_hangman_show_nextword');
+		
 	echo '<br/>';
 	if( ($hangman->try < $hangman->maxtries) or ($hangman->maxtries == 0)){
 		//continue to next word

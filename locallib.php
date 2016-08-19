@@ -107,6 +107,8 @@ function game_question_shortanswer_glossary( $game, $allowspaces, $use_repetitio
 {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_question_shortanswer_glossary');
+
 	if( $game->glossaryid == 0){
 		error( get_string( 'must_select_glossary', 'game'));
 	}
@@ -134,6 +136,10 @@ function game_question_shortanswer_glossary( $game, $allowspaces, $use_repetitio
         $rec->attachment = "glossary/{$game->glossaryid}/$rec->id/$rec->attachment";
     }
     
+    error_log('mod/game/locallib.php : game_question_shortanswer_glossary: '.$rec->questiontext.' = '.$rec->answertext);    
+	//error_log('mod/game/locallib.php : game_question_shortanswer_glossary: rec: ');    
+	//error_log(print_r($rec, true));
+    
     return $rec;
 }
 
@@ -141,6 +147,8 @@ function game_question_shortanswer_glossary( $game, $allowspaces, $use_repetitio
 function game_question_shortanswer_quiz( $game, $allowspaces, $use_repetitions)
 {
     global $DB;
+
+	error_log('mod/game/locallib.php : game_question_shortanswer_quiz');
 
 	if( $game->quizid == 0){
 		print_error( get_string( 'must_select_quiz', 'game'));
@@ -176,6 +184,8 @@ function game_question_shortanswer_question( $game, $allowspaces, $use_repetitio
 {
     global $DB;
 	
+	error_log('mod/game/locallib.php : game_question_shortanswer_question');
+		
 	if( $game->questioncategoryid == 0){
 		print_error( get_string( 'must_select_questioncategory', 'game'));
 	}
@@ -445,6 +455,9 @@ function game_detectlanguage( $word){
 //so I try to find the correct one.
 function game_getallletters( $word, $lang='')
 {
+
+	error_log('mod/game/locallib.php : game_getallletters: lang: '.$lang);
+	
     for(;;)
     {
         $strings = get_string_manager()->load_component_strings( 'game', $lang);
@@ -452,6 +465,17 @@ function game_getallletters( $word, $lang='')
         {
             $letters = $strings[ 'lettersall'];
             $word2 = game_upper( $word, $lang);
+            
+            // major hack for pinyin - JWK
+			// tones and consontants:
+			// abcdefghijklmnopqrstuvwxyz
+			// ABCDEFGHIJKLMNOPQRSTUVWXYZ
+			// ā ē ī ō ū ǖ Ā Ē Ī Ō Ū Ǖ
+			// á é í ó ú ǘ Á É Í Ó Ú Ǘ
+			// ǎ ě ǐ ǒ ǔ ǚ Ǎ Ě Ǐ Ǒ Ǔ Ǚ
+			// à è ì ò ù ǜ À È Ì Ò Ù Ǜ
+			// a e i o u ü A E I O U Ü            
+            $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZĀĒĪŌŪǕÁÉÍÓÚǗǍĚǏǑǓǙÀÈÌÒÙǛAEIOUÜ';
             if( hangman_existall( $word2, $letters))
                 return $letters;
         }
@@ -469,13 +493,11 @@ function game_getallletters( $word, $lang='')
 
 function hangman_existall( $str, $strfind)
 {
-	//$textlib = textlib_get_instance();
+	error_log('mod/game/locallib.php : hangman_existall: '. $str.' in '.$strfind);
 	
-    //$n = $textlib->strlen( $str);
-    $n = core_text::strlen( $str);
+	$n = core_text::strlen( $str);
     for( $i=0; $i < $n; $i++)
     {
-		//$pos = $textlib->strpos( $strfind, $textlib->substr( $str, $i, 1));
 		$pos = core_text::strpos( $strfind, core_text::substr( $str, $i, 1));
         if( $pos === false)
             return false;
