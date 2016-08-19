@@ -16,6 +16,8 @@
     require_once("../../config.php");
     require_once("locallib.php");
 
+	error_log('mod/game/bookquiz/importppt.php');
+
     $id     = required_param('id', PARAM_INT);         // Course Module ID
     $pageid = optional_param('pageid', '', PARAM_INT); // Page ID
     global $matches;
@@ -38,7 +40,8 @@
     }
 
     require_login($course->id, false);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     require_capability('mod/lesson:edit', $context);
 
     $strimportppt = get_string("importppt", "lesson");

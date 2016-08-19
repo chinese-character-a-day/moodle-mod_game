@@ -32,8 +32,9 @@ define( "CONST_GAME_TRIES_REPETITION", "3");
 
 function game_upper( $str, $lang='')
 {
-	$textlib = textlib_get_instance();
-    $str = $textlib->strtoupper( $str);
+	//$textlib = textlib_get_instance();
+    //$str = $textlib->strtoupper( $str);
+    $str = core_text::strtoupper( $str);
 
     $strings = get_string_manager()->load_component_strings( 'game', $lang);
     if( !isset( $strings[ 'convertfrom']))
@@ -43,9 +44,12 @@ function game_upper( $str, $lang='')
 	
     $from = $strings[ 'convertfrom'];
     $to = $strings[ 'convertto'];
-    $len = $textlib->strlen( $from);
+    //$len = $textlib->strlen( $from);
+    $len = core_text::strlen( $from);
+    
     for($i=0; $i < $len; $i++){
-        $str = str_replace( $textlib->substr( $from, $i, 1), $textlib->substr( $to, $i, 1), $str);
+        //$str = str_replace( $textlib->substr( $from, $i, 1), $textlib->substr( $to, $i, 1), $str);
+        $str = str_replace( core_text::substr( $from, $i, 1), core_text::substr( $to, $i, 1), $str);
     }
 	
     return $str;
@@ -465,12 +469,14 @@ function game_getallletters( $word, $lang='')
 
 function hangman_existall( $str, $strfind)
 {
-	$textlib = textlib_get_instance();
+	//$textlib = textlib_get_instance();
 	
-    $n = $textlib->strlen( $str);
+    //$n = $textlib->strlen( $str);
+    $n = core_text::strlen( $str);
     for( $i=0; $i < $n; $i++)
     {
-		$pos = $textlib->strpos( $strfind, $textlib->substr( $str, $i, 1));
+		//$pos = $textlib->strpos( $strfind, $textlib->substr( $str, $i, 1));
+		$pos = core_text::strpos( $strfind, core_text::substr( $str, $i, 1));
         if( $pos === false)
             return false;
     }
@@ -600,13 +606,15 @@ function game_questions_shortanswer_question_fraction( $table, $fields, $select)
 	{
 		$ret = "";
 		
-		$textlib = textlib_get_instance();
+		//$textlib = textlib_get_instance();
 	
 		if( $pos > 0){
-			$ret .= $textlib->substr( $s, 0, $pos);
+			//$ret .= $textlib->substr( $s, 0, $pos);
+			$ret .= core_text::substr( $s, 0, $pos);
 		}
 		
-		$s = $ret . $char . $textlib->substr( $s, $pos+1);
+		//$s = $ret . $char . $textlib->substr( $s, $pos+1);
+		$s = $ret . $char . core_text::substr( $s, $pos+1);
 	}
 
 

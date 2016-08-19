@@ -9,6 +9,8 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
 {
     global $DB, $USER;
 
+	error_log('mod/game/cross/play.php : game_cross_continue');
+		
 	if( $endofgame){
 		if( $g == ''){
 			game_updateattempts( $game, $attempt, -1, true);
@@ -23,7 +25,7 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
 	if( $attempt == false){
 		$attempt = game_addattempt( $game);
 	}
-	$textlib = textlib_get_instance();
+	//$textlib = textlib_get_instance();
 
 	$cross = new CrossDB();
 
@@ -39,7 +41,8 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
     $reps = array();
 	foreach( $recs as $rec){
 	    if( $game->param7 == false){	        
-    		if( $textlib->strpos( $rec->answertext, ' ')){
+    		//if( $textlib->strpos( $rec->answertext, ' ')){
+    		if( core_text::strpos( $rec->answertext, ' ')){
 	    		continue;		//spaces not allowed
 	    	}
 	    }

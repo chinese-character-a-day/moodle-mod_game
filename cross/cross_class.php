@@ -39,8 +39,10 @@ class Cross
 	
 	function setwords( $answers, $maxcols, $reps)
 	{
-		$textlib = textlib_get_instance();
-
+		error_log('mod/game/cross/cross_class.php : setwords');
+		error_log('mod/game/cross/cross_class.php : setwords: answers: ');
+		error_log(print_r($answers, true));	
+		
         $this->m_reps = array();
 		foreach( $reps as $word => $r){
 			$this->m_reps[ game_upper( $word)] = $r;
@@ -62,7 +64,7 @@ class Cross
 		$maxlen = 0;
 		foreach( $this->m_input_answers as $word => $answer)
 		{
-			$len = $textlib->strlen( $word);
+			$len = core_text::strlen( $word);
 			if( $len > $maxlen){
 				$maxlen = $len;
 			}
@@ -82,7 +84,7 @@ class Cross
 		$this->m_words = array();
 		foreach( $this->m_input_answers as $word => $answer)
 		{
-			$len =$textlib->strlen( $word);
+			$len =core_text::strlen( $word);
 
 			if( $len <= $this->m_N20max){
 				$this->m_words[] = game_upper( $word);
@@ -96,6 +98,8 @@ class Cross
   
     function randomize()
     {
+		error_log('mod/game/cross/cross_class.php : randomize');
+		    
         $n = count( $this->m_words);
 		for($j=0; $j <= $n/4; $j++)
 		{
@@ -107,6 +111,8 @@ class Cross
 
     function computedata( &$crossm, &$crossd, $maxwords)
     {
+		error_log('mod/game/cross/cross_class.php : computedata');
+    
         $t1 = time();
     
         $ctries = 0;
@@ -142,6 +148,8 @@ class Cross
   
 	function computenextcross( $N20, $t1, $ctries, $maxwords, &$nochange)
 	{
+		error_log('mod/game/cross/cross_class.php : computenextcross');
+			
         $MAXW = $N20;
     
 		$N21 = $N20 + 1;
@@ -230,8 +238,8 @@ class Cross
 
     function computescore( $puzzle, $N20, $N22, $N2222, $n_words, &$n_connectors, &$n_filleds, &$cSpaces, $cross_word)
     {
-        $textlib = textlib_get_instance();
-
+		error_log('mod/game/cross/cross_class.php : computescore');
+		    
 		$n_connectors = $n_filleds = 0;
 		$puzzle00 = str_replace('.', '0', $puzzle);
 
@@ -254,7 +262,7 @@ class Cross
 
         $sum_rep = 0;
         foreach( $cross_word as $word){
-            $word = $textlib->substr( $word, 1, -1);        
+            $word = core_text::substr( $word, 1, -1);        
 
             if( array_key_exists( $word, $this->m_reps))
                 $sum_rep += $this->m_reps[ $word] - $this->m_average_reps;
@@ -266,7 +274,7 @@ class Cross
  
     function computepuzzleinfo( $N20, $cross_pos, $cross_dir, $cross_word, $bPrint=false)
     {
-	    $textlib = textlib_get_instance();
+		error_log('mod/game/cross/cross_class.php : computepuzzleinfo');    
 	
 	    $bPrint=false;
         $N22 = $N20 + 2;
@@ -290,7 +298,7 @@ class Cross
           $row = floor( $pos / $N22);
           $dir = $cross_dir[ $i];
 
-          $len =  $textlib->strlen($cross_word[ $i])-3;
+          $len = core_text::strlen($cross_word[ $i])-3;
 
           if( $bPrint)
             echo "col=$col row=$row dir=$dir word=".$cross_word[ $i]."<br>";
@@ -326,6 +334,8 @@ class Cross
 
       function savepuzzle( &$crossm, &$crossd, $ctries, $time)
       {
+			error_log('mod/game/cross/cross_class.php : savepuzzle');    
+		      
             $N22 = $this->m_best_N20 + 2;
 
             $cols = $this->m_maxcol - $this->m_mincol + 1;
@@ -403,7 +413,7 @@ class Cross
 
 	function display($puzzle, $N20) 
     {
-        $textlib = textlib_get_instance();
+		error_log('mod/game/cross/cross_class.php : display');    
 
 		$N21 = $N20 + 1;
 		$N22 = $N20 + 2;
@@ -413,7 +423,7 @@ class Cross
     
 		$ret = "<table border=0 cellpadding=2 cellspacing=1><tr>";
 		for ($n = 0;; $n ++) {
-			$c = $textlib->substr( $puzzle, $n, 1);
+			$c = core_text::substr( $puzzle, $n, 1);
 		
 			if (($m = $n % $N22) == 0 or $m == $N21 or $n < $N22 or $n > $N2200) {
 				$ret .= "<td class=marc>  </td>";
@@ -422,10 +432,10 @@ class Cross
 			} elseif ($c == '.') {
 				$ret .= "<td class=blanc> </td>";
 			} else {
-				if (($textlib->substr( $puzzle, $n - 1, 1) > '0' or 
-				$textlib->substr( $puzzle, $n + 1, 1) > '0') and
-				($textlib->substr( $puzzle, $n - $N22, 1) > '0' 
-				  or $textlib->substr( $puzzle, $n + $N22, 1) > '0')) {
+				if ((core_text::substr( $puzzle, $n - 1, 1) > '0' or 
+				core_text::substr( $puzzle, $n + 1, 1) > '0') and
+				(core_text::substr( $puzzle, $n - $N22, 1) > '0' 
+				  or core_text::substr( $puzzle, $n + $N22, 1) > '0')) {
 					$ret .= "<td align=center class=connector>$c</td>";
 				} else {
 					$ret .= "<td align=center class=filled>$c</td>";
@@ -444,8 +454,8 @@ class Cross
 
 	function scan_pos($pos, $dir, $val_blanc, &$puzzle, &$words, &$magics, &$poss, &$cross_pos, &$cross_dir, &$cross_word, $N20)
 	{
-		$textlib = textlib_get_instance();
-		
+		error_log('mod/game/cross/cross_class.php : scan_pos');    
+				
 		$MAXW = $N20;
     
 		$N22 = $N20 + 2;
@@ -468,23 +478,23 @@ class Cross
 			$new_dir = 'h';
 		}
 
-	    $regex  = $textlib->substr( $puzzle, $pos, 1);
+	    $regex  = core_text::substr( $puzzle, $pos, 1);
     	if ( ($regex  == '0' or $regex == '.') and (! $val_blanc)){
 	    	return false;
 	    }
 
-        if (($textlib->substr( $puzzle, $pos -  $inc, 1) > '0')){
+        if ((core_text::substr( $puzzle, $pos -  $inc, 1) > '0')){
 	    	return false;
 	    }
 
-        if (($textlib->substr( $puzzle, $pos + $inc, 1) > '0')){
+        if ((core_text::substr( $puzzle, $pos + $inc, 1) > '0')){
 	    	return false;
 	    }
 
         $left = $right = 0;
-        for ($limit_a = $pos - $inc; ($w = $textlib->substr( $puzzle, $limit_a, 1)) !== '0'; $limit_a -= $inc)
+        for ($limit_a = $pos - $inc; ($w = core_text::substr( $puzzle, $limit_a, 1)) !== '0'; $limit_a -= $inc)
         {
-	    	if ($w == '.' and (($textlib->substr( $puzzle, $limit_a -  $oinc, 1) > '0') or ($textlib->substr( $puzzle, $limit_a +  $oinc, 1) > '0'))){
+	    	if ($w == '.' and ((core_text::substr( $puzzle, $limit_a -  $oinc, 1) > '0') or (core_text::substr( $puzzle, $limit_a +  $oinc, 1) > '0'))){
 	    		break;
 	    	}
 		
@@ -496,9 +506,9 @@ class Cross
 	    	$regex = $w . $regex;
         }
 
-        for ($limit_b = $pos + $inc; ($w = $textlib->substr( $puzzle, $limit_b, 1)) !== '0'; $limit_b += $inc)
+        for ($limit_b = $pos + $inc; ($w = core_text::substr( $puzzle, $limit_b, 1)) !== '0'; $limit_b += $inc)
         {
-	    	if ($w== '.' and (($textlib->substr( $puzzle, $limit_b -  $oinc, 1) > '0') or ($textlib->substr( $puzzle, $limit_b +  $oinc, 1) > '0'))){
+	    	if ($w== '.' and ((core_text::substr( $puzzle, $limit_b -  $oinc, 1) > '0') or (core_text::substr( $puzzle, $limit_b +  $oinc, 1) > '0'))){
 	    		break;
 	    	}
 		
@@ -510,7 +520,7 @@ class Cross
 	    	$regex .= $w;
         }
 
-        if (($len_regex = $textlib->strlen($regex)) < 2){
+        if (($len_regex = core_text::strlen($regex)) < 2){
 	    	return false;
 	    }
 
@@ -523,36 +533,36 @@ class Cross
 
 	    	for($pos_c = $ini; $pos_c <= $fin; $pos_c++, $pos_p += $inc)
 	    	{
-	    		if ($textlib->substr( $puzzle, $pos_p - $inc, 1) > '0'){
+	    		if (core_text::substr( $puzzle, $pos_p - $inc, 1) > '0'){
 	    			continue;
 	    		}
 
-	    		$w = $textlib->substr($regex, $pos_c, $lens);
+	    		$w = core_text::substr($regex, $pos_c, $lens);
 
 	    		if( !$this->my_preg_match( $w, $words, $word))
     				continue;
 
-    			$larr0 = $pos_p + (($textlib->strlen( $word) - 2) * $inc);
+    			$larr0 = $pos_p + ((core_text::strlen( $word) - 2) * $inc);
 
     			if ($larr0 >= $N2222){
     				continue;
     			}
 
-    			if ($textlib->substr( $puzzle, $larr0, 1) > '0'){
+    			if (core_text::substr( $puzzle, $larr0, 1) > '0'){
     				continue;
     			}
 
     			$words = str_replace( $word, ';', $words);
 
-    			$len = $textlib->strlen( $word) ;
+    			$len = core_text::strlen( $word) ;
     			for ($n = 1, $pp = $pos_p; $n < $len - 1; $n++, $pp += $inc)
     			{				
-    				$this->setchar( $puzzle, $pp,  $textlib->substr( $word , $n, 1));
+    				$this->setchar( $puzzle, $pp,  core_text::substr( $word , $n, 1));
 				
     				if ($pp == $pos)
     					continue;
 				
-				    $c = $textlib->substr( $puzzle, $pp, 1);
+				    $c = core_text::substr( $puzzle, $pp, 1);
 				    $poss[] = array($pp, $new_dir, ord( $c));
 			    }
 
@@ -572,20 +582,19 @@ class Cross
 
 	function my_preg_match( $w, $words, &$word)
 	{
-		$textlib = textlib_get_instance();
 		
 		$a = explode( ";", $words);
-		$len_w = $textlib->strlen( $w);
+		$len_w = core_text::strlen( $w);
 		foreach( $a as $test)
 		{
-			if( $textlib->strlen( $test) != $len_w)
+			if( core_text::strlen( $test) != $len_w)
 				continue;
 			
 			for( $i=0; $i <$len_w; $i++)
 			{
-				if( $textlib->substr( $w, $i, 1) == '.')
+				if( core_text::substr( $w, $i, 1) == '.')
 					continue;
-				if( $textlib->substr( $w, $i, 1)  != $textlib->substr( $test, $i, 1) )
+				if( core_text::substr( $w, $i, 1)  != core_text::substr( $test, $i, 1) )
 					break;
 			}
 			if( $i < $len_w)
@@ -600,19 +609,17 @@ class Cross
 
 	function setchar( &$s, $pos, $char)
 	{
-		$textlib = textlib_get_instance();
 		
 		$ret = "";
 		
 		if( $pos > 0)
-			$ret .= $textlib->substr( $s, 0, $pos);
+			$ret .= core_text::substr( $s, 0, $pos);
 		
-		$s = $ret . $char . $textlib->substr( $s, $pos+1);
+		$s = $ret . $char . core_text::substr( $s, $pos+1);
 	}
 	
 	function showhtml_base( $crossm, $crossd, $showsolution, $showhtmlsolutions)
 	{
-		$textlib = textlib_get_instance();
 		
 		$this->m_LegendH = array();
 		$this->m_LegendV = array();
@@ -641,7 +648,7 @@ class Cross
 		
 			$i++;
 
-			$sWordLength .= ",".$textlib->strlen( $rec->answertext);
+			$sWordLength .= ",".core_text::strlen( $rec->answertext);
 			$sClue .= ',"'.game_tojavascriptstring( game_filtertext( $rec->questiontext, 0))."\"\r\n";
 			$sguess .= ',"'.$rec->studentanswer.'"';
 			$sWordX .= ",".($rec->col-1);
@@ -682,7 +689,6 @@ class Cross
 		}
 		
 		$letters = get_string( 'millionaire_letters_answers', 'game');
-		$textlib = textlib_get_instance();
 		
 		unset( $this->m_LegendH);
 		foreach( $LegendH as $key => $value)
@@ -693,7 +699,7 @@ class Cross
 		    {
 		        for( $i=0; $i < count( $value); $i++)
 		        {
-		            $this->m_LegendH[ $key.$textlib->substr( $letters, $i, 1)] = $value[ $i];
+		            $this->m_LegendH[ $key.core_text::substr( $letters, $i, 1)] = $value[ $i];
                 }
 		    }
 		}
@@ -707,7 +713,7 @@ class Cross
 		    {
 		        for( $i=0; $i < count( $value); $i++)
 		        {
-		            $this->m_LegendV[ $key.$textlib->substr( $letters, $i, 1)] = $value[ $i];
+		            $this->m_LegendV[ $key.core_text::substr( $letters, $i, 1)] = $value[ $i];
                 }
 		    }
 		}
@@ -715,16 +721,16 @@ class Cross
 		ksort( $this->m_LegendH);
 		ksort( $this->m_LegendV);
 
-		$sRet .= "WordLength = new Array( ".$textlib->substr( $sWordLength, 1).");\n";
-		$sRet .= "Clue = new Array( ".$textlib->substr( $sClue, 1).");\n";
+		$sRet .= "WordLength = new Array( ".core_text::substr( $sWordLength, 1).");\n";
+		$sRet .= "Clue = new Array( ".core_text::substr( $sClue, 1).");\n";
 		$sguess = str_replace( ' ', '_', $sguess);
-		$sRet .= "Guess = new Array( ".$textlib->substr( $sguess, 1).");\n";
-		$sRet .= "Solutions = new Array( ".$textlib->substr( $ssolutions, 1).");\n";
+		$sRet .= "Guess = new Array( ".core_text::substr( $sguess, 1).");\n";
+		$sRet .= "Solutions = new Array( ".core_text::substr( $ssolutions, 1).");\n";
 		if( $showhtmlsolutions){
-		    $sRet .= "HtmlSolutions = new Array( ".$textlib->substr( $shtmlsolutions, 1).");\n";
+		    $sRet .= "HtmlSolutions = new Array( ".core_text::substr( $shtmlsolutions, 1).");\n";
 		}
-		$sRet .= "WordX = new Array( ".$textlib->substr( $sWordX, 1).");\n";
-		$sRet .= "WordY = new Array( ".$textlib->substr( $sWordY, 1).");\n";
+		$sRet .= "WordX = new Array( ".core_text::substr( $sWordX, 1).");\n";
+		$sRet .= "WordY = new Array( ".core_text::substr( $sWordY, 1).");\n";
 		$sRet .= "LastHorizontalWord = $LastHorizontalWord;\n";
 
 		return $sRet;
@@ -732,15 +738,13 @@ class Cross
 
 
 	function cmp($a, $b) {
-		$textlib = textlib_get_instance();
 		
-		return $textlib->strlen($b) - $textlib->strlen($a);
+		return core_text::strlen($b) - core_text::strlen($a);
 	}
 
 
 	function cmp_magic($a, $b) {
-		$textlib = textlib_get_instance();
 		
-		return ($textlib->strlen($a) + mt_rand(0, 3)) - ($textlib->strlen($b) - mt_rand(0, 1));
+		return (core_text::strlen($a) + mt_rand(0, 3)) - (core_text::strlen($b) - mt_rand(0, 1));
 	}
 }

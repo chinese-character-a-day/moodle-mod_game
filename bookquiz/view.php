@@ -3,6 +3,8 @@
 require_once('../../config.php');
 require_once('lib.php');
 
+error_log('mod/game/bookquiz/view.php');
+
 $id        = required_param('id', PARAM_INT);           // Course Module ID
 $chapterid = optional_param('chapterid', 0, PARAM_INT); // Chapter ID
 $edit      = optional_param('edit', -1, PARAM_BOOL);     // Edit mode
@@ -24,7 +26,8 @@ if (!$book = $DB->get_record('book', array( 'id' => $cm->instance))) {
 
 require_course_login($course, true, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+//$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 /// read chapters
 $select = $allowedit ? "bookid = $book->id" : "bookid = $book->id AND hidden = 0";

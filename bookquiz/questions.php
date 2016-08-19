@@ -11,6 +11,8 @@
 	require_once( "../header.php");
     require_once("../locallib.php");
 
+	error_log('mod/game/bookquiz/questions.php');
+
 	$attempt = game_getattempt( $game, $detail);
     if( $game->bookid == 0){
         error( get_string( 'bookquiz_not_select_book', 'game'));
@@ -39,7 +41,8 @@
 	}
 	
 	$recs = $DB->get_records( 'question_categories', null, '*', 0, 1);
-    $context = get_context_instance(50, $COURSE->id);
+    //$context = get_context_instance(50, $COURSE->id);
+    $context = context_module::instance($COURSE->id);
     $select = " contextid in ($context->id)";
 
 	$a = array();

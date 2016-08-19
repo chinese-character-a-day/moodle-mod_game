@@ -5,6 +5,8 @@
     require_once($CFG->dirroot.'/mod/game/locallib.php');
     require_once($CFG->libdir . '/completionlib.php');
 
+	error_log('mod/game/header.php');
+
     $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
     $q = optional_param('q',  0, PARAM_INT);  // game ID
 
@@ -32,7 +34,8 @@
 
 /// Check login and get context.
     require_login($course->id, false, $cm);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     require_capability('mod/game:view', $context);
 
 /// Cache some other capabilites we use several times.
@@ -50,7 +53,8 @@
     //}
 
 /// Log this request.
-    add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
+	// TODO: fix add_to_log by replacing with event2
+    //add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
 
 /// Initialize $PAGE, compute blocks
     $PAGE->set_url('/mod/game/view.php', array('id' => $cm->id));
@@ -60,7 +64,8 @@
         $USER->editing = $edit;
     }
 
-    $PAGE->requires->yui2_lib('event');
+	// TODO: fix yui2_lib to use yui 3
+    //$PAGE->requires->yui2_lib('event');
 
     // Note: MDL-19010 there will be further changes to printing header and blocks.
     // The code will be much nicer than this eventually.

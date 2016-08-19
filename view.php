@@ -6,6 +6,8 @@
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/mod/game/locallib.php');
 
+	error_log('mod/game/view.php');
+
     $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 
     if (! $cm = get_coursemodule_from_id('game', $id)) {
@@ -20,7 +22,10 @@
 
 /// Check login and get context.
     require_login($course->id, false, $cm);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    
+    //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	$context = context_module::instance($cm->id);
+	
     require_capability('mod/game:view', $context);
 
 /// Cache some other capabilites we use several times.
@@ -29,7 +34,23 @@
     $timenow = time();
 
 /// Log this request.
-    add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
+    //add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
+
+    // log using event2
+    // see mod/quiz/attemptlib.php : fire_state_transition_event
+// 	$params = array(
+// 		'context' => $context,
+// 		'courseid' => $course->id,
+// 		'game' => $game->id,
+// 		'coursemoduleid' => $cm->id,
+// 	);
+// 
+// 	$eventclass = '\mod_quiz\event\attempt_submitted';
+// 	$event = $eventclass::create($params);
+// 	$event->add_record_snapshot('game', $game->id);
+// 	$event->add_record_snapshot('game_view', $cm->id);
+// 	$event->trigger();
+
 
 /// Initialize $PAGE, compute blocks
     $PAGE->set_url('/mod/game/view.php', array('id' => $cm->id));
@@ -39,7 +60,7 @@
         $USER->editing = $edit;
     }
 
-    $PAGE->requires->yui2_lib('event');
+    //$PAGE->requires->yui2_lib('event');
 
     $title = $course->shortname . ': ' . format_string($game->name);
 

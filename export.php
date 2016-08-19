@@ -14,7 +14,10 @@ require_once ($CFG->dirroot.'/lib/formslib.php');
 require( 'locallib.php');
 require( 'header.php');
 
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	
+
+    //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     if (!has_capability('mod/game:viewreports', $context))
         return;
 

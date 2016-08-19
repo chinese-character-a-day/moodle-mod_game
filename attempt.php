@@ -28,6 +28,8 @@
     {
         global $DB, $USER, $PAGE, $OUTPUT;
 
+		error_log('mod/game/attempt.php : game_show_header');
+
         $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
         $q = optional_param('q',  0, PARAM_INT);  // game ID
 
@@ -55,7 +57,9 @@
 
         /// Check login and get context.
         require_login($course->id, false, $cm);
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        //$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
+        
         require_capability('mod/game:view', $context);
 
         /// Cache some other capabilites we use several times.
@@ -72,7 +76,7 @@
         //}
 
         /// Log this request.
-        add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
+        //add_to_log($course->id, 'game', 'view', "view.php?id=$cm->id", $game->id, $cm->id);
 
         /// Initialize $PAGE, compute blocks
         $PAGE->set_url('/mod/game/view.php', array('id' => $cm->id));
@@ -82,7 +86,8 @@
             $USER->editing = $edit;
         }
 
-        $PAGE->requires->yui2_lib('event');
+		
+        //$PAGE->requires->yui2_lib('event');
 
         // Note: MDL-19010 there will be further changes to printing header and blocks.
         // The code will be much nicer than this eventually.
@@ -106,6 +111,8 @@
     {
         global $OUTPUT;
 
+		error_log('mod/game/attempt.php : game_do_attempt');
+		
 	    $forcenew = optional_param('forcenew', false, PARAM_BOOL); // Teacher has requested new preview
         $continue = false;
 /// Print the main part of the page
@@ -184,6 +191,8 @@
 	{
 		global $USER, $CFG, $DB;
 		
+		error_log('mod/game/attempt.php : game_create');
+				
 		$attempt = game_getattempt( $game, $detail);
 
 		switch( $game->gamekind)
@@ -239,6 +248,8 @@
 	{
 		global $DB, $USER;
 		
+		error_log('mod/game/attempt.php : game_addattempt');
+				
 		$newrec->gamekind = $game->gamekind;
 		$newrec->gameid = $game->id;
 		$newrec->userid = $USER->id;
@@ -265,20 +276,27 @@
 	
 function game_cross_unpackpuzzle( $g)
 {
+
+	error_log('mod/game/attempt.php : game_cross_unpackpuzzle');
+		
 	$ret = "";
-	$textlib = textlib_get_instance();
+	//$textlib = textlib_get_instance();
 	
-	$len = $textlib->strlen( $g);
+	//$len = $textlib->strlen( $g);
+	$len = core_text::strlen($g);
 	while( $len)
 	{
 		for( $i=0; $i < $len; $i++)
 		{
-			$c = $textlib->substr( $g, $i, 1);
+			//$c = $textlib->substr( $g, $i, 1);
+			$c = core_text::substr( $g, $i, 1);
 			if( $c >= '1' and $c <= '9'){
 			    if( $i > 0){
 			        //found escape character
-			        if(  $textlib->substr( $g, $i-1, 1) == '/'){
-			            $g = $textlib->substr( $g, 0, $i-1).$textlib->substr( $g, $i);
+			        //if(  $textlib->substr( $g, $i-1, 1) == '/'){
+			        if(  core_text::substr( $g, $i-1, 1) == '/'){
+			            //$g = $textlib->substr( $g, 0, $i-1).$textlib->substr( $g, $i);
+			            $g = core_text::substr( $g, 0, $i-1).core_text::substr($g, $i);
 			            $i--;
 			            $len--;
 			            continue;
@@ -292,16 +310,21 @@ function game_cross_unpackpuzzle( $g)
 			//found the start of a number
 			for( $j=$i+1; $j < $len; $j++)
 			{
-				$c = $textlib->substr( $g, $j, 1);
+				//$c = $textlib->substr( $g, $j, 1);
+				$c = core_text::substr( $g, $j, 1);
 				if( $c < '0' or $c > '9'){
 					break;
 				}
 			}
-			$count = $textlib->substr( $g, $i, $j-$i);
-			$ret .= $textlib->substr( $g, 0, $i) . str_repeat( '_', $count);
+			//$count = $textlib->substr( $g, $i, $j-$i);
+			$count = core_text::substr( $g, $i, $j-$i);
+			//$ret .= $textlib->substr( $g, 0, $i) . str_repeat( '_', $count);
+			$ret .= core_text::substr( $g, 0, $i) . str_repeat( '_', $count);
 			
-			$g = $textlib->substr( $g, $j);
-			$len = $textlib->strlen( $g);
+			//$g = $textlib->substr( $g, $j);
+			$g = core_text::substr( $g, $j);
+			//$len = $textlib->strlen( $g);
+			$len =  core_text::strlen( $g);
 			
 		}else
 		{
