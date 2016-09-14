@@ -456,7 +456,7 @@ function game_detectlanguage( $word){
 function game_getallletters( $word, $lang='')
 {
 
-	error_log('mod/game/locallib.php : game_getallletters: lang: '.$lang);
+	//error_log('mod/game/locallib.php : game_getallletters: lang: '.$lang);
 	
     for(;;)
     {
@@ -493,7 +493,7 @@ function game_getallletters( $word, $lang='')
 
 function hangman_existall( $str, $strfind)
 {
-	error_log('mod/game/locallib.php : hangman_existall: '. $str.' in '.$strfind);
+	//error_log('mod/game/locallib.php : hangman_existall: '. $str.' in '.$strfind);
 	
 	$n = core_text::strlen( $str);
     for( $i=0; $i < $n; $i++)
@@ -670,7 +670,10 @@ function game_questions_shortanswer_question_fraction( $table, $fields, $select)
 	{
         global $DB, $USER;
 
-	    if( $attempt != false){	    
+	    if( $attempt != false){	  
+	    	if (!isset($updrec)) {
+	    		$updrec = new stdClass();
+	    	}
 		    $updrec->id = $attempt->id;
     		$updrec->timelastattempt = time();
     		$updrec->lastip = getremoteaddr();
@@ -758,6 +761,8 @@ function game_questions_shortanswer_question_fraction( $table, $fields, $select)
 			}
 		}
 		
+		// initialize updrec if not already initialized
+		$updrec = (!isset($updrec)) ? new stdClass() : $updrec; 		
 		$updrec->id = $recq->id;
 		$updrec->timelastattempt = time();
 		
@@ -1179,6 +1184,7 @@ function game_sudoku_getquestions( $questionlist)
 }
 
 function game_filtertext( $text, $courseid){
+	$formatoptions = (!isset($formatoptions)) ? new stdClass() : $formatoptions;
     $formatoptions->noclean = true;
     $formatoptions->filter = 1;
     $text = trim( format_text( $text, FORMAT_MOODLE, $formatoptions, $courseid));

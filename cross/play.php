@@ -88,6 +88,8 @@ function showlegend( $legend, $title)
 {
     if( count( $legend) == 0)
         return;
+
+	error_log('mod/game/cross/play.php : showlegend');
     
     echo "<br><b>$title</b><br>";
     foreach( $legend as $key => $line)
@@ -97,6 +99,8 @@ function showlegend( $legend, $title)
 function game_cross_play( $id, $game, $attempt, $crossrec, $g, $onlyshow, $showsolution, $endofgame, $print, $checkbutton, $showhtmlsolutions, $showhtmlprintbutton)
 {
 	global $CFG, $DB;
+
+	error_log('mod/game/cross/play.php : game_cross_play');
 
 	$cross = new CrossDB();
 
