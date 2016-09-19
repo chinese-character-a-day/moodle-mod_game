@@ -6,6 +6,8 @@ class CryptexDB extends CrossDB
 	{
 		global $USER;
 
+		error_log('mod/game/cryptex/cryptexdb_class.php : save');
+		
         CrossDB::delete_records( $id);
 
 		if( (CrossDB::save( $game, $crossm, $crossd, $id)) == false){
@@ -27,6 +29,7 @@ class CryptexDB extends CrossDB
 
 	function computeletters( $crossm, $crossd)
 	{
+		error_log('mod/game/cryptex/cryptexdb_class.php : computeletters');
 		
 		$letters = '';
 		$cols = $crossm->cols + 1;
@@ -91,7 +94,8 @@ class CryptexDB extends CrossDB
 
     function display( $cols, $rows, $letters, $mask, $showsolution, $textdir)
     {
-		
+		error_log('mod/game/cryptex/cryptexdb_class.php : display');
+				
 		echo "<table border=1 $textdir>";
 		for( $row=0; $row < $rows; $row++)
 		{
@@ -167,7 +171,8 @@ class CryptexDB extends CrossDB
 	{
         global $DB;
 
-		
+		error_log('mod/game/cryptex/cryptexdb_class.php : load');
+				
 		$questions = array();
 		$corrects = array();
 		
@@ -221,6 +226,9 @@ class CryptexDB extends CrossDB
     
 	function computedata( &$crossm, &$crossd, &$letters, $maxwords)
 	{	
+	
+		error_log('mod/game/cryptex/cryptexdb_class.php : computedata');
+			
 		if( !cross::computedata( $crossm, $crossd, $maxwords)){
 			return false;
 		}

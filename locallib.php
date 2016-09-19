@@ -286,7 +286,8 @@ function game_update_repetitions( $gameid, $userid, $questionid, $glossaryentryi
     global $DB;
 
     $a = array( 'gameid' => $gameid, 'userid' => $userid, 'questionid' => $questionid, 'glossaryentryid' => $glossaryentryid);
-    if( ($rec = $DB->get_record( 'game_repetitions', $a, 'id,repetitions r')) != false){
+    if( ($rec = $DB->get_record( 'game_repetitions', $a, 'id,repetitions r')) != false) {
+    	$updrec = new stdClass();
         $updrec->id = $rec->id;
         $updrec->repetitions = $rec->r + 1;
         if( !$DB->update_record( 'game_repetitions', $updrec)){
@@ -294,6 +295,7 @@ function game_update_repetitions( $gameid, $userid, $questionid, $glossaryentryi
         }
     }else
     {
+    	$newrec = new stdClass();
         $newrec->gameid = $gameid;
         $newrec->userid = $userid;
         $newrec->questionid = $questionid;
@@ -786,6 +788,8 @@ function game_questions_shortanswer_question_fraction( $table, $fields, $select)
 	function game_getattempt( $game, &$detail)
 	{
 		global $DB, $USER;
+		
+		error_log('mod/game/locallib.php : game_getattempt: gameid: '.$game->id.' userid: '.$USER->id);
 		
 		$select = "gameid=$game->id AND userid=$USER->id and timefinish=0 ";
 		if( $USER->id == 1){

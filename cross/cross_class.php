@@ -205,36 +205,36 @@ class Cross
 			}
 		}
 
-    $n_words = count( $cross_word);
-	$score = $this->computescore( $puzzle, $N20, $N22, $N2222, $n_words, $n_connectors, $n_filleds, $cSpaces, $cross_word);
+		$n_words = count( $cross_word);
+		$score = $this->computescore( $puzzle, $N20, $N22, $N2222, $n_words, $n_connectors, $n_filleds, $cSpaces, $cross_word);
 
-	if ($score > $this->m_best_score)
-	{
-		$this->m_best_cross_pos = $cross_pos;
-		$this->m_best_cross_dir = $cross_dir;
-		$this->m_best_cross_word = $cross_word;
-		$this->m_best_puzzle = $puzzle;
+		if ($score > $this->m_best_score)
+		{
+			$this->m_best_cross_pos = $cross_pos;
+			$this->m_best_cross_dir = $cross_dir;
+			$this->m_best_cross_word = $cross_word;
+			$this->m_best_puzzle = $puzzle;
 
-		$this->m_bests = array('Words' => "$n_words * 5 = " . ($n_words * 5),
-			'Connectors' => "$n_connectors * 3 = " . ($n_connectors * 3),
-			'Filled in spaces' => $n_filleds,
-			"N20" => $N20
-		);
-                  
-		$this->m_best_score = $score;
+			$this->m_bests = array('Words' => "$n_words * 5 = " . ($n_words * 5),
+				'Connectors' => "$n_connectors * 3 = " . ($n_connectors * 3),
+				'Filled in spaces' => $n_filleds,
+				"N20" => $N20
+			);
+				  
+			$this->m_best_score = $score;
 		
-		$this->m_best_connectors = $n_connectors;
-		$this->m_best_filleds = $n_filleds;
-		$this->m_best_spaces = $cSpaces;
-		$this->m_best_N20 = $N20;      
-		$nochange = 0;
-	}else
-	{
-		$nochange++;
-	}
+			$this->m_best_connectors = $n_connectors;
+			$this->m_best_filleds = $n_filleds;
+			$this->m_best_spaces = $cSpaces;
+			$this->m_best_N20 = $N20;      
+			$nochange = 0;
+		}else
+		{
+			$nochange++;
+		}
 
-	return true;
-}
+		return true;
+	}
 
     function computescore( $puzzle, $N20, $N22, $N2222, $n_words, &$n_connectors, &$n_filleds, &$cSpaces, $cross_word)
     {
@@ -352,7 +352,9 @@ class Cross
                 Swap( $this->m_mincol, $this->m_minrow);
                 Swap( $this->m_maxcol, $this->m_maxrow);
             }
-	
+				
+			// initialize crossm if not already initialized
+			$crossm = (!isset($crossm)) ? new stdClass() : $crossm;
             $crossm->datebegin = time();
             $crossm->time = $time;
             $crossm->cols = $cols;
@@ -382,6 +384,9 @@ class Cross
                 $word = substr( $word, 1, strlen( $word)-2);
 
                 unset( $rec);
+      
+				// initialize rec if not already initialized
+				$rec = new stdClass();
       
                 $rec->col = $col;
                 $rec->row = $row;
@@ -454,7 +459,7 @@ class Cross
 
 	function scan_pos($pos, $dir, $val_blanc, &$puzzle, &$words, &$magics, &$poss, &$cross_pos, &$cross_dir, &$cross_word, $N20)
 	{
-		error_log('mod/game/cross/cross_class.php : scan_pos');    
+		error_log('mod/game/cross/cross_class.php : scan_pos: pos: '.$pos.' dir: '.$dir);    
 				
 		$MAXW = $N20;
     
@@ -620,6 +625,8 @@ class Cross
 	
 	function showhtml_base( $crossm, $crossd, $showsolution, $showhtmlsolutions)
 	{
+	
+		error_log('mod/game/cross/cross_class.php showhtml_base: rows: '.$crossm->rows.' cols: '.$crossm->cols);
 		
 		$this->m_LegendH = array();
 		$this->m_LegendV = array();

@@ -273,11 +273,13 @@
 		return $DB->get_record_select( 'game_attempts', 'id='.$newid);
 	}
 	
-	
+// reformat game string to get rid of bogus values - replace with underbar '_'
+// game_cross_unpackpuzzle: g: QING WEN3I4W_N_
+// game_cross_unpackpuzzle: ret: QING WEN___I____W_N_	
 function game_cross_unpackpuzzle( $g)
 {
 
-	error_log('mod/game/attempt.php : game_cross_unpackpuzzle');
+	error_log('mod/game/attempt.php : game_cross_unpackpuzzle: g: '.$g);
 		
 	$ret = "";
 	//$textlib = textlib_get_instance();
@@ -332,6 +334,8 @@ function game_cross_unpackpuzzle( $g)
 			break;
 		}
 	}
+	
+	error_log('mod/game/attempt.php : game_cross_unpackpuzzle: ret: '.$ret);
 	
 	return $ret;
 }

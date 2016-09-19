@@ -77,6 +77,8 @@ class CrossDB extends Cross
     $this->m_maxcol = $crossrec->cols;
     $this->m_maxrow = $crossrec->rows;
 
+	error_log('mod/game/cross/crossdb_class.php : load: rows: '.$this->m_maxrow.' cols: '.$this->m_maxcol.' attemptid: '.$crossrec->id);
+
     if( $g == ""){
 		$g = str_repeat( ' ', $this->m_maxcol * $this->m_maxrow);
 	}
@@ -84,6 +86,7 @@ class CrossDB extends Cross
 	$load = false;
 	
     $puzzle = str_repeat('.', $this->m_maxrow * $this->m_maxcol);
+    
 	if ($recs = $DB->get_records( 'game_queries', array( 'attemptid' => $crossrec->id)))
     {
 		$a = array();
@@ -94,7 +97,7 @@ class CrossDB extends Cross
 			} else {
 				$key = sprintf( 'v%10d %10d', $rec->col, $rec->row);				
 			}
-			error_log('mod/game/cross/crossdb_class.php : load: key: '. $key);
+			error_log('mod/game/cross/crossdb_class.php : load: key: '. $key.' game_queries.answertext: '.$rec->answertext);
 						
 			$a[ $key] = $rec;			
 		}
@@ -185,7 +188,8 @@ class CrossDB extends Cross
 		return $ret;
 	}
 
-	//rec is a record of cross_questions
+	// rec is a record of cross_questions from game_queries db table
+	// scan through elements of game board string $g, and match letters into the correct record values
 	function updatecrossquestions( &$rec, &$g, &$pos, &$correctletters, &$wrongletters, &$restletters, $game, $attempt, $crossrec)
 	{
 		global $DB, $USER;
@@ -239,7 +243,7 @@ class CrossDB extends Cross
 			}
 		}
 		
-		error_log('mod/game/cross/crossdb_class.php : updatecrossquestions: correct: '.$correctletters.' wrong: '.$wrongletters);
+		//error_log('mod/game/cross/crossdb_class.php : updatecrossquestions: correct: '.$correctletters.' wrong: '.$wrongletters);
 		
 		if( $is_empty){
 			return;

@@ -9,7 +9,7 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
 {
     global $DB, $USER;
 
-	error_log('mod/game/cross/play.php : game_cross_continue');
+	error_log('mod/game/cross/play.php : game_cross_continue id: '.$id);
 		
 	if( $endofgame){
 		if( $g == ''){
@@ -41,7 +41,6 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
     $reps = array();
 	foreach( $recs as $rec){
 	    if( $game->param7 == false){	        
-    		//if( $textlib->strpos( $rec->answertext, ' ')){
     		if( core_text::strpos( $rec->answertext, ' ')){
 	    		continue;		//spaces not allowed
 	    	}
@@ -76,6 +75,7 @@ function game_cross_continue( $id, $game, $attempt, $cross, $g='', $endofgame=''
 		
 		game_updateattempts( $game, $attempt, 0, 0);
 		
+		// ($id, $game, $attempt, $crossrec, $g, $onlyshow, $showsolution, $endofgame, $print, $checkbutton, $showhtmlsolutions, $showhtmlprintbutton)
 		return game_cross_play( $id, $game, $attempt, $crossm, '', false, false, false, false, false, false, false);
 	}
 	
@@ -100,7 +100,7 @@ function game_cross_play( $id, $game, $attempt, $crossrec, $g, $onlyshow, $shows
 {
 	global $CFG, $DB;
 
-	error_log('mod/game/cross/play.php : game_cross_play');
+	error_log('mod/game/cross/play.php : game_cross_play id: '.$id.' attemptid: '.$attempt->id);
 
 	$cross = new CrossDB();
 

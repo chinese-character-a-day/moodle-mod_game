@@ -129,6 +129,7 @@
     }
 
 /// Print table with existing attempts
+// use get_string for language string lookups - https://docs.moodle.org/dev/String_API
     if ($attempts) {
 
         echo $OUTPUT->heading(get_string('summaryofattempts', 'quiz'));
