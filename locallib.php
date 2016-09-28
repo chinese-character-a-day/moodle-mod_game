@@ -166,6 +166,8 @@ function game_question_shortanswer_glossary( $game, $allowspaces, $userepetition
 function game_question_shortanswer_quiz( $game, $allowspaces, $userepetitions) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_question_shortanswer_quiz');
+
     if ($game->quizid == 0) {
         print_error( get_string( 'must_select_quiz', 'game'));
     }
@@ -206,6 +208,8 @@ function game_question_shortanswer_quiz( $game, $allowspaces, $userepetitions) {
 function game_question_shortanswer_question( $game, $allowspaces, $userepetitions) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_question_shortanswer_question');
+	
     if ($game->questioncategoryid == 0) {
         print_error( get_string( 'must_select_questioncategory', 'game'));
     }
@@ -248,6 +252,8 @@ function game_question_shortanswer_question( $game, $allowspaces, $userepetition
 function game_question_selectrandom( $game, $table, $select, $idfields='id', $userepetitions=true) {
     global $DB, $USER;
 
+	error_log('mod/game/locallib.php : game_question_selectrandom');
+	
     $count = $DB->get_field_sql( "SELECT COUNT(*) FROM $table WHERE $select");
 
     if ($count == 0) {
@@ -312,6 +318,8 @@ function game_question_selectrandom( $game, $table, $select, $idfields='id', $us
 function game_update_repetitions( $gameid, $userid, $questionid, $glossaryentryid) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_update_repetitions');
+	
     $a = array( 'gameid' => $gameid, 'userid' => $userid, 'questionid' => $questionid, 'glossaryentryid' => $glossaryentryid);
     if (($rec = $DB->get_record( 'game_repetitions', $a, 'id,repetitions AS r')) != false) {
         $updrec = new stdClass();
@@ -344,6 +352,8 @@ function game_update_repetitions( $gameid, $userid, $questionid, $glossaryentryi
 function game_questions_selectrandom( $game, $count=1) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_questions_selectrandom');
+	
     switch( $game->sourcemodule)
     {
         case 'quiz':
@@ -576,6 +586,8 @@ function game_questions_shortanswer_glossary( $game) {
 function game_questions_shortanswer_quiz( $game) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_questions_shortanswer_quiz');
+	
     if ($game->quizid == 0) {
         print_error( get_string( 'must_select_quiz', 'game'));
     }
@@ -605,6 +617,9 @@ function game_questions_shortanswer_quiz( $game) {
 
 // Used by cross.
 function game_questions_shortanswer_question( $game) {
+
+	error_log('mod/game/locallib.php : game_questions_shortanswer_question');
+	
     if ($game->questioncategoryid == 0) {
         print_error( get_string( 'must_select_questioncategory', 'game'));
     }
@@ -672,6 +687,8 @@ function game_setchar( &$s, $pos, $char) {
 function game_insert_record( $table, $rec) {
     global $DB;
 
+	error_log('mod/game/locallib.php : game_insert_record: table: '.$table);
+
     if ($DB->get_record($table, array('id' => $rec->id), 'id,id') == false) {
         $sql = 'INSERT INTO {'.$table.'}(id) VALUES('.$rec->id.')';
         if (!$DB->execute( $sql)) {
@@ -696,6 +713,8 @@ function game_insert_record( $table, $rec) {
 // If score is negative doesn't update the record score is between 0 and 1.
 function game_updateattempts( $game, $attempt, $score, $finished) {
     global $DB, $USER;
+
+	error_log('mod/game/locallib.php : game_updateattempts attemptid: '.$attempt->id.' score: '.$score);
 
     if ($attempt != false) {
         $updrec = new stdClass();
@@ -753,6 +772,8 @@ function game_updateattempts_maxgrade( $game, $attempt, $grade, $finished) {
 
 function game_update_queries( $game, $attempt, $query, $score, $studentanswer, $updatetries=false) {
     global $DB, $USER;
+    
+	error_log('mod/game/locallib.php : game_update_queries studentanswer: '.$studentanswer);    
 
     if ($query->id != 0) {
         $select = "id=$query->id";
@@ -810,6 +831,8 @@ function game_update_queries( $game, $attempt, $query, $score, $studentanswer, $
 function game_getattempt( $game, &$detail, $autoadd=false) {
     global $DB, $USER;
 
+	error_log('mod/game/locallib.php : game_getattempt');    
+	
     $select = "gameid=$game->id AND userid=$USER->id and timefinish=0 ";
     if ($USER->id == 1) {
         $key = 'mod/game:instanceid'.$game->id;
@@ -1034,6 +1057,8 @@ function game_get_combined_reviewoptions($game, $attempts, $context=null) {
  */
 function game_save_best_score($game) {
     global $DB, $USER;
+
+	error_log('mod/game/locallib.php : game_save_best_score');
 
     // Get all the attempts made by the user.
     if (!$attempts = game_get_user_attempts( $game->id, $USER->id, 'all')) {
@@ -1867,6 +1892,8 @@ function get_string_from_file($identifier, $langfile, $destination) {
 // Inserts a record to game_attempts.
 function game_addattempt( $game) {
     global $DB, $USER;
+
+	error_log('mod/game/locallib.php game_addattempt gamekind: '.$game->gamekind);
 
     $newrec = new stdClass();
     $newrec->gamekind = $game->gamekind;

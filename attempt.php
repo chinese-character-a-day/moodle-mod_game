@@ -119,7 +119,7 @@ function game_show_header( &$id, &$game, &$course, &$context) {
 function game_do_attempt( $id, $game, $action, $course, $context) {
     global $OUTPUT;
 
-	error_log('mod/game/attempt.php : game_do_attempt');
+	error_log('mod/game/attempt.php : game_do_attempt action: '.$action);
 	
     $forcenew = optional_param('forcenew', false, PARAM_BOOL); // Teacher has requested new preview.
     $endofgame = optional_param('endofgame', false, PARAM_BOOL);
@@ -193,7 +193,7 @@ function game_do_attempt( $id, $game, $action, $course, $context) {
 function game_create( $game, $id, $forcenew, $course, $context) {
     global $USER, $CFG, $DB;
 
-	error_log('mod/game/attempt.php : game_create');
+	error_log('mod/game/attempt.php : game_create gamekind: '.$game->gamekind);
 	
     $attempt = game_getattempt( $game, $detail);
     $chapterid = optional_param('chapterid',  0, PARAM_INT);

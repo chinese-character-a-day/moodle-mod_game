@@ -57,7 +57,7 @@ class Cross
     
 		error_log('mod/game/cross/cross_class.php : setwords');    
 		error_log('mod/game/cross/cross_class.php : setwords: answers: ');
-		error_log(print_r($answers, true));
+		//error_log(print_r($answers, true));
 		
         $this->mreps = array();
         foreach ($reps as $word => $r) {

@@ -16,22 +16,13 @@
 
 // This file plays the game hangman.
 
-function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $action, $context) {
+// DANGER! modifying the game module creates some dependencies...
+// function is from game_hangman_continue - JWK
+function game_hangman_find_words($game) {
     global $DB, $USER;
-
-    if ($attempt != false and $hangman != false) {
-        if (($action == 'nextword') and ($hangman->finishedword != 0)) {
-            // Finish with one word and continue to another.
-            if (!$DB->set_field( 'game_hangman', 'finishedword', 0, array( 'id' => $hangman->id))) {
-                error( "game_hangman_continue: Can't update game_hangman");
-            }
-        } else {
-            return game_hangman_play( $id, $game, $attempt, $hangman, false, false, $context);
-        }
-    }
-
-    $updatehangman = (($attempt != false) and ($hangman != false));
-
+    
+	error_log('mod/game/hangman/play.php: game_hangman_find_words');
+	
     // New game.
     srand ((double)microtime() * 1000003);
 
@@ -121,19 +112,16 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
             }
         }
     }
+    
+    return array($found,$min);
+}
 
-    if ($found == false) {
-        print_error( get_string( 'no_words', 'game'));
-    }
-
-    // Found one word for hangman.
-    if ($attempt == false) {
-        $attempt = game_addattempt( $game);
-    }
-
-    if (!$DB->set_field( 'game_attempts', 'language', $min->language, array( 'id' => $attempt->id))) {
-        print_error( "game_hangman_continue: Can't set language");
-    }
+// DANGER! modifying the game module creates some dependencies...
+// function is from game_hangman_continue - JWK
+function game_hangman_update_game_queries($game, $attempt, $min) {
+	global $DB, $USER;
+	
+    error_log('mod/game/hangman/play.php: game_hangman_update_game_queries');
 
     $query = new stdClass();
     $query->attemptid = $attempt->id;
@@ -147,11 +135,21 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
     $query->score = 0;
     $query->timelastattempt = time();
     $query->answertext = $min->answer;
-    $query->answerid = $min->answerid;
+    $query->answerid = $min->answerid; 
+        
     if (!($query->id = $DB->insert_record( 'game_queries', $query))) {
         print_error( "game_hangman_continue: Can't insert to table game_queries");
     }
 
+	return $query;
+}
+
+// DANGER! modifying the game module creates some dependencies...
+// function is from game_hangman_continue - JWK
+function game_hangman_update_game_hangman($game, $attempt, $min, $query, $updatehangman) {
+
+	error_log('mod/game/hangman/play.php: game_hangman_update_game_hangman');
+	
     $newrec = new stdClass();
     $newrec->id = $attempt->id;
     $newrec->queryid = $query->id;
@@ -174,7 +172,7 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
     if ($game->param2) {
         $letters .= game_substr( $min->answer, -1, 1);
     }
-    $newrec->letters = $letters;
+    $newrec->letters = $letters;  
 
     if ($updatehangman == false) {
         if (!game_insert_record(  'game_hangman', $newrec)) {
@@ -187,6 +185,46 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
         $newrec = $DB->get_record( 'game_hangman', array( 'id' => $newrec->id));
     }
 
+	return $newrec;
+}
+
+function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $action, $context) {
+    global $DB, $USER;
+
+    error_log('mod/game/hangman/play.php: game_hangman_continue');
+        
+    if ($attempt != false and $hangman != false) {
+        if (($action == 'nextword') and ($hangman->finishedword != 0)) {
+            // Finish with one word and continue to another.
+            if (!$DB->set_field( 'game_hangman', 'finishedword', 0, array( 'id' => $hangman->id))) {
+                error( "game_hangman_continue: Can't update game_hangman");
+            }
+        } else {
+            return game_hangman_play( $id, $game, $attempt, $hangman, false, false, $context);
+        }
+    }
+
+    $updatehangman = (($attempt != false) and ($hangman != false));
+
+	list($found, $min) = game_hangman_find_words($game);
+
+    if ($found == false) {
+        print_error( get_string( 'no_words', 'game'));
+    }
+
+    // Found one word for hangman.
+    if ($attempt == false) {
+        $attempt = game_addattempt( $game);
+    }
+
+    if (!$DB->set_field( 'game_attempts', 'language', $min->language, array( 'id' => $attempt->id))) {
+        print_error( "game_hangman_continue: Can't set language");
+    }
+
+	$query = game_hangman_update_game_queries($game, $attempt, $min);
+	
+	$newrec = game_hangman_update_game_hangman($game, $attempt, $min, $query, $updatehangman);
+
     game_update_repetitions( $game->id, $USER->id, $query->questionid, $query->glossaryentryid);
 
     game_hangman_play( $id, $game, $attempt, $newrec, false, false, $context);
@@ -194,6 +232,8 @@ function game_hangman_continue( $id, $game, $attempt, $hangman, $newletter, $act
 
 function game_hangman_onfinishgame( $game, $attempt, $hangman) {
     global $DB;
+
+	error_log('mod/game/hangman/play.php: game_hangman_onfinishgame');
 
     $score = $hangman->corrects / $hangman->maxtries;
 
@@ -207,6 +247,8 @@ function game_hangman_onfinishgame( $game, $attempt, $hangman) {
 function game_hangman_play( $id, $game, $attempt, $hangman, $onlyshow, $showsolution, $context) {
     global $CFG, $DB, $OUTPUT;
 
+	error_log('mod/game/hangman/play.php: game_hangman_play');
+	
     $query = $DB->get_record( 'game_queries', array( 'id' => $hangman->queryid));
 
     if ($attempt->language != '') {
@@ -293,6 +335,8 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$wordline, &$wordli
     if ( $newletter == '_') {
         $newletter = ' ';
     }
+
+	error_log('mod/game/hangman/play.php: hangman_showpage word: "'.$word.'" newletter: '.$newletter);
 
     $letters = $hangman->letters;
     if ($newletter != null) {
@@ -410,6 +454,8 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$wordline, &$wordli
         return;
     }
 
+	error_log('mod/game/hangman/play.php: hangman_showpage update_record: letters:'.$letters);
+
     if (!$DB->update_record( 'game_hangman', $updrec)) {
         print_error( "hangman_showpage: Can't update game_hangman id=$updrec->id");
     }
@@ -430,6 +476,8 @@ function hangman_showpage(&$done, &$correct, &$wrong, $max, &$wordline, &$wordli
 // If reach the max number of words I have to finish else continue with next word.
 function hangman_oncorrect( $id, $wordline, $game, $attempt, $hangman, $query) {
     global $DB;
+    
+    error_log('mod/game/hangman/play.php: hangman_oncorrect');
 
     echo "<br/><br/><font size=\"5\">\n$wordline</font>\r\n";
 
@@ -447,6 +495,8 @@ function hangman_oncorrect( $id, $wordline, $game, $attempt, $hangman, $query) {
 function hangman_onincorrect( $id, $wordline, $word, $game, $attempt, $hangman, $onlyshow, $showsolution) {
     echo "\r\n<br/><br/><font size=\"5\">\n$wordline</font>\r\n";
 
+    error_log('mod/game/hangman/play.php: hangman_onincorrect');
+    
     if ( $onlyshow or $showsolution) {
         return;
     }
@@ -469,6 +519,8 @@ function hangman_onincorrect( $id, $wordline, $word, $game, $attempt, $hangman, 
 function game_hangman_show_nextword( $id, $game, $attempt, $hangman) {
     global $CFG, $DB;
 
+	error_log('mod/game/hangman/play.php: game_hangman_show_nextword');
+	
     echo '<br/>';
     if (($hangman->try < $hangman->maxtries) or ($hangman->maxtries == 0)) {
         // Continue to next word.
